@@ -9,7 +9,7 @@ This function should only modify configuration layer settings."
    ;; Base distribution to use. This is a layer contained in the directory
    ;; `+distribution'. For now available distributions are `spacemacs-base'
    ;; or `spacemacs'. (default 'spacemacs)
-   dotspacemacs-distribution 'spacemacs
+   dotspacemacs-distribution 'spacemacs-base
 
    ;; Lazy installation of layers (i.e. layers are installed only when a file
    ;; with a supported type is opened). Possible values are `all', `unused'
@@ -32,13 +32,12 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(vimscript
-     html
+   '(
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
      ;; `M-m f e R' (Emacs style) to install them.
-     ;;----------------------------------------------------------------
+     ;; ----------------------------------------------------------------
      auto-completion
      better-defaults
      emacs-lisp
@@ -47,25 +46,26 @@ This function should only modify configuration layer settings."
      lsp
      markdown
      multiple-cursors
-     org
+     (org :variables
+          org-enable-roam-support t
+          org-enable-roam-protocol t
+          org-enable-roam-server t
+          org-roam-directory "~/org-roam/"
+          org-roam-v2-ack t)
      (shell :variables
              shell-default-height 30
              shell-default-position 'bottom)
      spell-checking
-     (spell-checking :variables
-                     ispell-program-name "aspell"
-                     ispell-dictionary "american")
      syntax-checking
      version-control
      treemacs
+     (chinese :variables
+              chinese-enable-youdao-dict t)
      themes-megapack
-     unicode-fonts
      (latex :vatiables
             latex-backend 'lsp
             latex-refresh-preview t
             latex-build-engine 'xetex)
-     (chinese :variables
-              chinese-enable-youdao-dict t)
      )
 
 
@@ -102,9 +102,13 @@ It should only modify the values of Spacemacs settings."
   ;; This setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
-   ;; If non-nil then enable support for the portable dumper. You'll need
-   ;; to compile Emacs 27 from source following the instructions in file
+   ;; If non-nil then enable support for the portable dumper. You'll need to
+   ;; compile Emacs 27 from source following the instructions in file
    ;; EXPERIMENTAL.org at to root of the git repository.
+   ;;
+   ;; WARNING: pdumper does not work with Native Compilation, so it's disabled
+   ;; regardless of the following setting when native compilation is in effect.
+   ;;
    ;; (default nil)
    dotspacemacs-enable-emacs-pdumper nil
 
@@ -235,7 +239,6 @@ It should only modify the values of Spacemacs settings."
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
-                         dracula
                          spacemacs-dark
                          spacemacs-light)
 
@@ -411,7 +414,7 @@ It should only modify the values of Spacemacs settings."
    ;;   :size-limit-kb 1000)
    ;; When used in a plist, `visual' takes precedence over `relative'.
    ;; (default nil)
-   dotspacemacs-line-numbers t
+   dotspacemacs-line-numbers nil
 
    ;; Code folding method. Possible values are `evil', `origami' and `vimish'.
    ;; (default 'evil)
@@ -531,7 +534,8 @@ This function defines the environment variables for your Emacs session. By
 default it calls `spacemacs/load-spacemacs-env' which loads the environment
 variables declared in `~/.spacemacs.env' or `~/.spacemacs.d/.spacemacs.env'.
 See the header of this file for more information."
-  (spacemacs/load-spacemacs-env))
+  (spacemacs/load-spacemacs-env)
+)
 
 (defun dotspacemacs/user-init ()
   "Initialization for user code:
@@ -539,21 +543,38 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
-  (setq configuration-layer-elpa-archives
-        '(("melpa-cn" . "http://mirrors.bfsu.edu.cn/elpa/melpa/")
-          ("org-cn" . "http://mirrors.bfsu.edu.cn/elpa/org/")
-          ("gnu-cn" . "http://mirrors.bfsu.edu.cn/elpa/gnu/")
-          ("non-gnu" . "https://elpa.nongnu.org/nongnu/")))
-  (setq tramp-ssh-controlmaster-options
-        "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no")  
-)
+  ;; use aspell as ispel backend
+  (setq-default ispell-program-name "aspell")
+  (setq spell-checking-enable-by-default nil)
+  ;; use American English as ispell default dictionary
+  (ispell-change-dictionary "american" t)
+  (setq ns-use-native-fullscreen nil)
+
+  (setq latex-view-pdf-in-split-window t)
+  (setq latex-view-with-pdf-tools nil)
+
+  ;;(setq custom-file (expand-file-name "custom.el" dotspacemacs-directory))
+  ;;(add-to-list 'spacemacs--python-pyvenv-modes 'pyenv)
+
+  ;;禁止备份文件
+  (setq make-backup-files nil)
+
+  ;;快捷键打开spacmecs的配置文件
+  (defun open-my-init-file ()
+    (interactive)
+    (find-file "~/.spacemacs.d/init.el"))
+  (global-set-key (kbd "<f1>") 'open-my-init-file)
+
+  (global-set-key (kbd "C-s") 'helm-occur)
+  )
 
 
 (defun dotspacemacs/user-load ()
   "Library to load while dumping.
 This function is called only while dumping Spacemacs configuration. You can
 `require' or `load' the libraries of your choice that will be included in the
-dump.")
+dump."
+)
 
 
 (defun dotspacemacs/user-config ()
@@ -562,56 +583,15 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
-  ;; use aspell as ispel backend
-  (setq-default ispell-program-name "aspell")
-  (setq spell-checking-enable-by-default nil)
-  ;; use American English as ispell default dictionary
-  (ispell-change-dictionary "american" t)
-
-  (setq ns-use-native-fullscreen nil)
-
-  (setq latex-view-pdf-in-split-window t)
-  (setq latex-view-with-pdf-tools nil)
-
-  ;(setq custom-file (expand-file-name "custom.el" dotspacemacs-directory))
-
-  (spacemacs//set-monospaced-font "Optima" "方正柳公权楷书 简" 22 23)
-
-  ;(add-to-list 'spacemacs--python-pyvenv-modes 'pyenv)
-
-  ;;禁止备份文件
-  (setq make-backup-files nil)
 
   (with-eval-after-load 'org
     (add-to-list 'org-export-backends 'md))
 
-  ;;快捷键打开spacmecs的配置文件
-  (defun open-my-init-file ()
-    (interactive)
-    (find-file "~/.spacemacs.d/init.el"))
-
-  (global-set-key (kbd "<f1>") 'open-my-init-file)
-
-  (global-set-key (kbd "C-s") 'helm-occur)
-
+  ;; Note: The Hiragino Sans GB is bundled with macOS.
+  ;; If you are not using macOS, you should change it to another Chinese font name.
+  (spacemacs//set-monospaced-font   "Source Code Pro" "冬青黑体简体中文 W6" 16 18)
 )
+
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
-(defun dotspacemacs/emacs-custom-settings ()
-  "Emacs custom settings.
-This is an auto-generated function, do not modify its content directly, use
-Emacs customize menu instead.
-This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
-)
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- ))
