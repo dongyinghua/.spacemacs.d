@@ -9,7 +9,7 @@ This function should only modify configuration layer settings."
     ;; Base distribution to use. This is a layer contained in the directory
     ;; `+distribution'. For now available distributions are `spacemacs-base'
     ;; or `spacemacs'. (default 'spacemacs)
-    dotspacemacs-distribution 'spacemacs-base
+    dotspacemacs-distribution 'spacemacs
 
     ;; Lazy installation of layers (i.e. layers are installed only when a file
     ;; with a supported type is opened). Possible values are `all', `unused'
@@ -41,7 +41,11 @@ This function should only modify configuration layer settings."
        auto-completion
        better-defaults
        emacs-lisp
-       git
+       (git :variables
+         git-enable-magit-delta-plugin t
+         git-enable-magit-gitflow-plugin t
+         git-enable-magit-svn-plugin t
+         git-enable-magit-todos-plugin t)
        helm
        lsp
        markdown
@@ -59,18 +63,14 @@ This function should only modify configuration layer settings."
        syntax-checking
        version-control
        (treemacs :variables
+         treemacs-use-git-mode 'deferred
          treemacs-use-filewatch-mode t
          treemacs-use-all-the-icons-theme t)
        (chinese :variables
          chinese-enable-youdao-dict t)
        themes-megapack
-       (latex :vatiables
-         latex-backend 'lsp
-         latex-refresh-preview t
-         latex-build-engine 'xetex)
-       gtags
-       unicode-fonts
-       eaf
+       (unicode-fonts :variables
+         unicode-fonts-force-multi-color-on-mac t)
        )
 
 
@@ -251,11 +251,9 @@ It should only modify the values of Spacemacs settings."
                            spacemacs-light
                            doom-tomorrow-day
                            doom-tomorrow-night
-                           doom-tokyo-night
                            doom-peacock
                            doom-one
                            doom-one-light
-                           doom-old-hope
                            doom-molokai
                            doom-dracula
                            gruvbox-dark-hard
@@ -566,41 +564,22 @@ configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
   (setq configuration-layer-elpa-archives
-    '(("melpa-cn" . "http://elpa.zilongshanren.com/melpa/")
-       ("org-cn"   . "http://elpa.zilongshanren.com/org/")
-       ("gnu-cn"   . "http://elpa.zilongshanren.com/gnu/")))
+    '(("melpa-cn"  . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+       ("org-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
+       ("gnu-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+       ("nongnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")))
 
-  ;; use aspell as ispel backend
+  ;; use apsell as ispell backend
   (setq-default ispell-program-name "aspell")
-  (setq spell-checking-enable-by-default nil)
   ;; use American English as ispell default dictionary
   (ispell-change-dictionary "american" t)
-  (setq ns-use-native-fullscreen nil)
 
-  (setq latex-view-pdf-in-split-window t)
-  (setq latex-view-with-pdf-tools nil)
-
-  ;;(setq custom-file (expand-file-name "custom.el" dotspacemacs-directory))
-  ;;(add-to-list 'spacemacs--python-pyvenv-modes 'pyenv)
-
-  ;;禁止备份文件
-  (setq make-backup-files nil)
-
-  ;;快捷键打开spacmecs的配置文件
-  (defun open-my-init-file ()
-    (interactive)
-    (find-file "~/.spacemacs.d/init.el"))
-  (global-set-key (kbd "<f1>") 'open-my-init-file)
-
-  (global-set-key (kbd "C-s") 'helm-occur)
-
-  (global-linum-mode t)
-  (global-flycheck-mode t)
-
-  ;; 空格自动快删
-  (require 'hungry-delete)
-  (global-hungry-delete-mode t)
+  (with-eval-after-load 'magit
+    (require 'forge))
+  (setq forge-add-default-bindings nil)
+  (setq-default git-magit-status-fullscreen t)
   )
+
 
 (defun dotspacemacs/user-load ()
   "Library to load while dumping.
@@ -620,9 +599,23 @@ before packages are loaded."
 
   ;; Note: The Hiragino Sans GB is bundled with macOS.
   ;; If you are not using macOS, you should change it to another Chinese font name.
-  (spacemacs//set-monospaced-font   "Source Code Pro" "冬青黑体简体中文 W6" 16 18)
+  (spacemacs//set-monospaced-font   "Source Code Pro" "冬青黑体简体中文 W6" 20 22)
 
-  (editorconfig-mode 1)
+
+  (defun open-my-init ()
+    (interactive)
+    (find-file "~/.spacemacs.d/init.el"))
+
+  (editorconfig-mode t)
+  (global-hungry-delete-mode t)
+  (setq hungry-delete-join-reluctantly t)
+  (global-visual-line-mode t)
+
+  ;;快捷键绑定
+  (global-set-key (kbd "<f1>") 'open-my-init)
+  (global-set-key (kbd "C-s") 'helm-occur)
+  (global-set-key (kbd "C-x C-b") 'helm-buffers-list)
+
   )
 
 
