@@ -50,12 +50,7 @@ This function should only modify configuration layer settings."
        lsp
        markdown
        multiple-cursors
-       (org :variables
-         org-enable-roam-support t
-         org-enable-roam-protocol t
-         org-enable-roam-server t
-         org-roam-directory "~/org-roam/"
-         org-roam-v2-ack t)
+       org
        (shell :variables
          shell-default-height 30
          shell-default-position 'bottom)
@@ -82,9 +77,7 @@ This function should only modify configuration layer settings."
     ;; `dotspacemacs/user-config'. To use a local version of a package, use the
     ;; `:location' property: '(your-package :location "~/path/to/your-package/")
     ;; Also include the dependencies as they will not be resolved automatically.
-    dotspacemacs-additional-packages '(
-                                        editorconfig
-                                        (org-roam-ui :location (recipe :fetcher github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))))
+    dotspacemacs-additional-packages '(editorconfig)
 
     ;; A list of packages that cannot be updated.
     dotspacemacs-frozen-packages '()
@@ -586,7 +579,6 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
 This function is called only while dumping Spacemacs configuration. You can
 `require' or `load' the libraries of your choice that will be included in the
 dump."
-  (load-file "~/.spacemacs.d/init-org.el")
   )
 
 
@@ -601,23 +593,49 @@ before packages are loaded."
   ;; If you are not using macOS, you should change it to another Chinese font name.
   (spacemacs//set-monospaced-font   "Source Code Pro" "冬青黑体简体中文 W6" 20 22)
 
+  ;;(load-file "~/.spacemacs.d/init-org.el")
+
+  ;;(add-to-list 'org-export-backends 'md)
+  ;;(setq org-startup-indented t)
 
   (defun open-my-init ()
     (interactive)
     (find-file "~/.spacemacs.d/init.el"))
+  (global-set-key (kbd "<f1>") 'open-my-init)
 
   (editorconfig-mode t)
   (global-hungry-delete-mode t)
   (setq hungry-delete-join-reluctantly t)
   (global-visual-line-mode t)
+  (setq make-backup-files nil)
+  (electric-pair-mode t)
 
   ;;快捷键绑定
-  (global-set-key (kbd "<f1>") 'open-my-init)
   (global-set-key (kbd "C-s") 'helm-occur)
   (global-set-key (kbd "C-x C-b") 'helm-buffers-list)
-
+  (global-set-key (kbd "C-x C-r") 'helm-recentf)
   )
 
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+    '(zonokai-emacs zenburn-theme zen-and-art-theme youdao-dictionary yasnippet-snippets ws-butler writeroom-mode winum white-sand-theme which-key vterm volatile-highlights vi-tilde-fringe uuidgen use-package unicode-fonts unfill undo-tree underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil treemacs-all-the-icons toxi-theme toc-org terminal-here tao-theme tangotango-theme tango-plus-theme tango-2-theme symon symbol-overlay sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection string-edit spaceline-all-the-icons spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smeargle shell-pop seti-theme reverse-theme restart-emacs request rebecca-theme rainbow-delimiters railscasts-theme quickrun pyim purple-haze-theme professional-theme popwin planet-theme phoenix-dark-pink-theme phoenix-dark-mono-theme password-generator paradox pangu-spacing overseer orgit-forge organic-green-theme org-superstar org-rich-yank org-projectile org-present org-pomodoro org-mime org-download org-contrib org-cliplink open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme naquadah-theme nameless mwim mustang-theme multi-term multi-line monokai-theme monochrome-theme molokai-theme moe-theme modus-themes mmm-mode minimal-theme material-theme markdown-toc majapahit-theme magit-todos magit-svn magit-gitflow magit-delta madhat2r-theme macrostep lush-theme lsp-ui lsp-treemacs lsp-origami lorem-ipsum link-hint light-soap-theme kaolin-themes jbeans-theme jazz-theme ir-black-theme inspector inkpot-theme info+ indent-guide hybrid-mode hungry-delete htmlize highlight-parentheses highlight-numbers highlight-indentation heroku-theme hemisu-theme helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-mode-manager helm-make helm-lsp helm-ls-git helm-git-grep helm-flx helm-descbinds helm-company helm-c-yasnippet helm-ag hc-zenburn-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme google-translate golden-ratio gnuplot gitignore-templates git-timemachine git-modes git-messenger git-link git-gutter-fringe gh-md gandalf-theme fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-package flycheck-elsa flx-ido flatui-theme flatland-theme find-by-pinyin-dired farmhouse-theme fancy-battery eziam-theme eyebrowse expand-region exotica-theme evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-easymotion evil-collection evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help emr elisp-slime-nav editorconfig dumb-jump drag-stuff dracula-theme dotenv-mode doom-themes django-theme dired-quick-sort diminish devdocs define-word darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized clues-theme clean-aindent-mode chocolate-theme chinese-conv cherry-blossom-theme centered-cursor-mode busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme ace-pinyin ace-link ace-jump-helm-line ac-ispell))
+ '(warning-suppress-types '((org-roam) (org-roam) (org-roam))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+)
