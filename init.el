@@ -52,8 +52,8 @@ This function should only modify configuration layer settings."
        multiple-cursors
        (org :variables
          org-enable-roam-support t
-         org-enable-roam-protocol t
          org-enable-roam-server t
+         org-enable-roam-protocol t
          org-roam-directory "~/Documents/org-roam"
          org-roam-v2-ack t)
        (shell :variables
@@ -85,7 +85,8 @@ This function should only modify configuration layer settings."
     dotspacemacs-additional-packages '(
                                         editorconfig
                                         (org-roam-ui :location
-                                          (recipe :fetcher github :repo "org-roam/org-roam-ui"
+                                          (recipe :fetcher
+                                            github :repo "org-roam/org-roam-ui"
                                             :branch "main" :files ("*.el" "out")))
                                         (org-roam-bibtex :location
                                           (recipe :fetcher github :repo "org-roam/org-roam-bibtex"))
@@ -568,10 +569,10 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
-(setq configuration-layer-elpa-archives
+  (setq configuration-layer-elpa-archives
     '(("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-      ("org-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
-      ("gnu-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")))
+       ("org-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
+       ("gnu-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")))
   ;; use apsell as ispell backend
   (setq-default ispell-program-name "aspell")
   ;; use American English as ispell default dictionary
@@ -603,6 +604,8 @@ before packages are loaded."
   ;; If you are not using macOS, you should change it to another Chinese font name.
   (spacemacs//set-monospaced-font   "Source Code Pro" "冬青黑体简体中文 W6" 20 22)
 
+  ;;需要开启Emacs Server才能使用org-roam的网页抓取
+  (server-start)
   (load-file "~/.spacemacs.d/init-org.el")
 
   (defun open-my-init ()
