@@ -15,16 +15,18 @@
 (setq org-roam-capture-templates
   '(
      ("d" "default" plain "%?"
-       :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                 "#+title: ${title}\n#+roam_alias:\n#+roam_key:\n#+roam_tags:\n\n")
+       :target (file+head "%<%Y%m%d%H>_${slug}.org"
+                 "#+latex_header:\n#+title: ${title}\n#+roam_alias:\n#+roam_key:\n#+roam_tags:\n\n")
        :unnarrowed t)
-     ("p" "Paper Note" plain "* 相关工作\n\n%?\n* 观点\n\n* 模型和方法\n\n* 实验\n\n* 结论\n"
-       :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                 "#+title: ${title}\n#+roam_alias:\n#+roam_tags:\n\n")
+     ("p" "Paper Note" plain "* FIRST PASS\n\n ** Category\n\n** Context\n\n** Correctness\n\n** Contribution\n\n** Clarity\n * SECOND PASS\n\n* * THIRD PASS"
+       :target (file+head "%<%Y%m%d%H>_${slug}.org"
+                 "#+latex_header:\n#+title: ${title}\n#+roam_alias:\n#+roam_key:\n#+roam_tags:\n\n")
        :unnarrowed t
        )
      )
   )
+
+;;网页抓取
 (setq org-roam-capture-ref-templates
   '(
      ("a" "Annotation" plain
@@ -34,7 +36,7 @@
        ;; :immediate-finish t
        :unnarrowed t
        )
-     ("r" "ref" plain ""
+     ("r" "ref" plain "* FIRST PASS\n\n** Category\n\n** Context\n\n** Correctness\n\n** Contribution\n\n** Clarity\n\n* SECOND PASS\n\n* THIRD PASS\n\n"
        :target (file+head "${slug}.org"
                  "#+title: ${title}\n#+roam_key: ${ref}\n#+roam_alias:\n#+roam_tags:\n\n")
        :unnarrowed t)
