@@ -38,7 +38,11 @@ This function should only modify configuration layer settings."
        ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
        ;; `M-m f e R' (Emacs style) to install them.
        ;; ----------------------------------------------------------------
-       auto-completion
+       (auto-completion :variables
+         auto-completion-tab-key-behavior 'complete
+         auto-completion-enable-snippets-in-popup t
+         auto-completion-use-company-box t
+         auto-completion-enable-sort-by-usage t) ;;"auto-completion-enable-sort-by-usage t"可能会影响性能
        better-defaults
        emacs-lisp
        (git :variables
@@ -609,6 +613,16 @@ before packages are loaded."
   ;; If you are not using macOS, you should change it to another Chinese font name.
   (spacemacs//set-monospaced-font   "Source Code Pro" "冬青黑体简体中文 W6" 20 22)
 
+  ;;Emacs 有一个自带的包来高亮括号，那就是 show-paren-mode，但它只会在编辑器的
+  ;;光标处在括号上时才会生效，我们可以使用子龙山人的代码来使光标在括号内时高亮括号。
+  ;;将下面的代码添加到 user-config 中。
+  (define-advice show-paren-function (:around (fn) fix-show-paren-function)
+    "Highlight enclosing parens."
+    (cond ((looking-at-p "\\s(") (funcall fn))
+	    (t (save-excursion
+	         (ignore-errors (backward-up-list))
+	         (funcall fn)))))
+
   ;;需要开启Emacs Server才能使用org-roam的网页抓取
   (server-start)
   (load-file "~/.spacemacs.d/init-org.el")
@@ -618,17 +632,20 @@ before packages are loaded."
     (find-file "~/.spacemacs.d/init.el"))
   (global-set-key (kbd "<f1>") 'open-my-init)
 
+
   (editorconfig-mode t)
+
   (global-hungry-delete-mode t)
   (setq hungry-delete-join-reluctantly t)
+
   (global-visual-line-mode t)
+
   (setq make-backup-files nil)
+
   (electric-pair-mode t)
 
   ;;快捷键绑定
-  (global-set-key (kbd "C-s") 'helm-occur)
-  (global-set-key (kbd "C-x C-b") 'helm-buffers-list)
-  (global-set-key (kbd "C-x C-r") 'helm-recentf)
+  (load-file "~/.spacemacs.d/init-keybindings.el")
   )
 
 
