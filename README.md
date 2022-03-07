@@ -33,7 +33,7 @@
 
 <a id="org068d926"></a>
 
-### Python layer 网址
+### Python layer
 
 [Python layer (Created: 2022-02-22 Tue 16:44)](https://develop.spacemacs.org/layers/+lang/python/README.html)
 
