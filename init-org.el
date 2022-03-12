@@ -11,18 +11,78 @@
   ;;Different bullets. By default the list is set to ("◉" "○" "✸" "✿").
   (setq org-bullets-bullet-list '("■" "◆" "▲" "▶"))
 
-  ;;org-mode for GTD
-  (with-eval-after-load 'org-agenda
-    (setq org-agenda-files "/Users/yinghuadong/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/inbox.org")
-    (require 'org-projectile)
-    (push (org-projectile:todo-files) org-agenda-files))
+  ;;todo dependencies
+  (setq alert-default-style 'notifications)
 
+  ;;org-journal support
+  (setq org-journal-dir "~/Documents/Org/Journal/")
+  (setq org-journal-file-format "%Y-%m-%d")
+  (setq org-journal-date-prefix "#+TITLE: ")
+  (setq org-journal-date-format "%A, %B %d %Y")
+  (setq org-journal-time-prefix "* ")
+  (setq org-journal-time-format "")
+
+  ;;org-agenda
+  (setq org-agenda-files '("~/Documents/Org/GTD/Inbox.org"
+                            "~/Documents/Org/GTD/Projects.org"
+                            "~/Documents/Org/GTD/Schedule.org"
+                            "~/Documents/Org/GTD/TODOs.org"))
+  (setq org-capture-templates '(("t" "inbox" entry
+                                  (file "~/Documents/Org/GTD/Inbox.org")
+                                  "* %i%?")
+                                 ("T" "Schedule" entry
+                                   (file+headline "/Documents/Org/GTD/Schedule.org")
+                                   "* %i%?\n %U")))
+  (setq org-refile-targets '(("~/Documents/Org/GTD/Projects.org" :maxlevel . 3)
+                              ("~/Documents/Org/GTD/TODOs.org" :maxlevel . 3)
+                              ("~/Documents/Org/GTD/Schedule.org" :maxlevel . 3)))
+  ;; 设置任务流程(这是我的配置)
+  (setq org-todo-keywords
+    '((sequence "TODO(t!)" "WAITE(w!)" "|" "DONE(d!)" "CANCEL(c/!)")))
+
+  ;; 设置任务样式
+  (setq org-todo-keyword-faces
+    '(("WAITE" .   (:foreground "red" :weight bold))
+       ("TODO" .      (:foreground "orange" :weight bold))
+       ("DONE" .      (:foreground "green" :weight bold))
+       ("CANCEL" .     (:background "gray" :foreground "black"))
+       ))
+  ;; agenda 里面时间块彩色显示
+  ;; From: https://emacs-china.org/t/org-agenda/8679/3
+  (defun ljg/org-agenda-time-grid-spacing ()
+    "Set different line spacing w.r.t. time duration."
+    (save-excursion
+      (let* ((background (alist-get 'background-mode (frame-parameters)))
+              (background-dark-p (string= background "dark"))
+              (colors (list "#1ABC9C" "#2ECC71" "#3498DB" "#9966ff"))
+              pos
+              duration)
+        (nconc colors colors)
+        (goto-char (point-min))
+        (while (setq pos (next-single-property-change (point) 'duration))
+          (goto-char pos)
+          (when (and (not (equal pos (point-at-eol)))
+                  (setq duration (org-get-at-bol 'duration)))
+            (let ((line-height (if (< duration 30) 1.0 (+ 0.5 (/ duration 60))))
+                   (ov (make-overlay (point-at-bol) (1+ (point-at-eol)))))
+              (overlay-put ov 'face `(:background ,(car colors)
+                                       :foreground
+                                       ,(if background-dark-p "black" "white")))
+              (setq colors (cdr colors))
+              (overlay-put ov 'line-height line-height)
+              (overlay-put ov 'line-spacing (1- line-height))))))))
+
+  (add-hook 'org-agenda-finalize-hook #'ljg/org-agenda-time-grid-spacing)
   ;;org-roam
   ;;必须要有init.el中加入(require 'org-roam-protocol)以及打开Emacs Server，否则网页抓取会出现问题
   ;;org-roam的网页抓取原理是利用 org-protocol 这样的外部程序和 Emacs 进行通信的机制
   (require 'org-roam-protocol)
   (setq org-roam-capture-templates
     '(
+       ("s" "simple default" plain "%?"
+         :target (file+head "%<%Y%m%d%H>_${slug}.org"
+                   "#+latex_header:\n#+title: ${title}\n\n")
+         :unnarrowed t)
        ("d" "default" plain "%?"
          :target (file+head "%<%Y%m%d%H>_${slug}.org"
                    "#+latex_header:\n#+title: ${title}\n#+roam_alias:\n#+roam_key:\n#+roam_tags:\n\n")

@@ -3,10 +3,16 @@
 *** org-roam
 **** 网页抓取
 ** python
-*** Python layer 网址
+*** Python layer
 [[https://develop.spacemacs.org/layers/+lang/python/README.html][Python layer (Created: 2022-02-22 Tue 16:44)]]
 *** pyenv 和 pyvenv 的使用
 **** pyenv
 用来对 Python 版本的控制
 **** pyvenv
 用来对 Python 虚拟环境的控制，应用在 major mode Inferior Python 中用来切换 python 版本。但是，需要先通过快捷键“SPC m v w”更换 Python 版本或虚拟环境；然后再通过快捷键“SPC m r”来重新启动 Python。
+** colors
+Nyan Cat 彩虹猫，用于显示文件进度。在 dotspacemacs-configuration-layers 里面新增所需 layer。
+#+begin_src emacs-lisp
+  (colors :variables
+          colors-enable-nyan-cat-progress-bar t)
+#+end_src

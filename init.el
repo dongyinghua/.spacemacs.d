@@ -1,4 +1,3 @@
-
 ;; This file is loaded by Spacemacs at startup.
 ;; It must be stored in your home directory.
 
@@ -56,12 +55,16 @@ This function should only modify configuration layer settings."
        markdown
        multiple-cursors
        (org :variables
+         org-todo-dependencies-strategy 'naive-auto
+         org-enable-notifications t
+         org-start-notification-daemon-on-startup t
+         org-enable-org-journal-support t
          org-enable-roam-support t
          org-enable-roam-server t
          org-enable-roam-protocol t
-         org-roam-directory "~/Documents/org-roam-directory"
+         org-roam-directory "~/Documents/Org/org-roam-directory"
          org-roam-v2-ack t
-         org-projectile-file "TODOs.org")
+         org-projectile-file "~/Documents/Org/GTD/projects.org")
        (shell :variables
          shell-default-height 30
          shell-default-position 'bottom)
@@ -83,11 +86,12 @@ This function should only modify configuration layer settings."
        (python :variables
          python-backend 'lsp
          python-test-runner 'pytest
-         python-formatter 'yapf
          python-format-on-save t
          python-save-before-test nil
          python-sort-imports-on-save t
          )
+       (colors :variables
+         colors-enable-nyan-cat-progress-bar t)
        )
 
 
@@ -629,9 +633,9 @@ before packages are loaded."
   (define-advice show-paren-function (:around (fn) fix-show-paren-function)
     "Highlight enclosing parens."
     (cond ((looking-at-p "\\s(") (funcall fn))
-	    (t (save-excursion
-	         (ignore-errors (backward-up-list))
-	         (funcall fn)))))
+      (t (save-excursion
+           (ignore-errors (backward-up-list))
+           (funcall fn)))))
 
   ;;需要开启Emacs Server才能使用org-roam的网页抓取
   (server-start)
@@ -641,7 +645,6 @@ before packages are loaded."
     (interactive)
     (find-file "~/.spacemacs.d/init.el"))
   (global-set-key (kbd "<f1>") 'open-my-init)
-
 
   (editorconfig-mode t)
 
@@ -660,8 +663,8 @@ before packages are loaded."
   ;;python
   (add-to-list 'spacemacs--python-pyenv-modes 'pyenv)
   (setq python-indent-guess-indent-offset-verbose nil)
- (add-to-list 'spacemacs--python-pyvenv-modes 'pyvenv)
-  (setq pyvenv-workon '("~/.pyenv/versions"))
+  (add-to-list 'spacemacs--python-pyvenv-modes 'pyvenv)
+  (setenv "WORKON_HOME" "~/.pyenv/versions")
   )
 
 
@@ -672,16 +675,16 @@ before packages are loaded."
 This is an auto-generated function, do not modify its content directly, use
 Emacs customize menu instead.
 This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+  (custom-set-variables
+    ;; custom-set-variables was added by Custom.
+    ;; If you edit it by hand, you could mess it up, so be careful.
+    ;; Your init file should contain only one such instance.
+    ;; If there is more than one, they won't work right.
+    )
+  (custom-set-faces
+    ;; custom-set-faces was added by Custom.
+    ;; If you edit it by hand, you could mess it up, so be careful.
+    ;; Your init file should contain only one such instance.
+    ;; If there is more than one, they won't work right.
+    )
   )
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-)
