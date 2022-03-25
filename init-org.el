@@ -1,8 +1,7 @@
 ;;org相关配置
-(defun open-my-init-org ()
-  (interactive)
-  (find-file "~/.spacemacs.d/init-org.el"))
-(global-set-key (kbd "<f2>") 'open-my-init-org)
+
+;;(add-to-list 'org-modules 'org-habit)
+;;(add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
 
 ;;Important Note by Spacemacs
 (with-eval-after-load 'org
@@ -14,39 +13,38 @@
   ;;todo dependencies
   (setq alert-default-style 'notifications)
 
-  ;;org-journal support
-  (setq org-journal-dir "~/Documents/Org/Journal/")
-  (setq org-journal-file-format "%Y-%m-%d")
-  (setq org-journal-date-prefix "#+TITLE: ")
-  (setq org-journal-date-format "%A, %B %d %Y")
-  (setq org-journal-time-prefix "* ")
-  (setq org-journal-time-format "")
-
   ;;org-agenda
   (setq org-agenda-files '("~/Documents/Org/GTD/Inbox.org"
                             "~/Documents/Org/GTD/Projects.org"
                             "~/Documents/Org/GTD/Schedule.org"
                             "~/Documents/Org/GTD/TODOs.org"))
-  (setq org-capture-templates '(("t" "inbox" entry
-                                  (file "~/Documents/Org/GTD/Inbox.org")
-                                  "* %i%?")
-                                 ("T" "Schedule" entry
-                                   (file+headline "/Documents/Org/GTD/Schedule.org")
-                                   "* %i%?\n %U")))
+  ;; 这边就是为路径赋值
+  (defvar org-agenda-dir "" "gtd org files location")
+  (setq-default org-agenda-dir "~/Documents/Org/GTD/")
+  (setq org-agenda-file-inbox (expand-file-name "Inbox.org" org-agenda-dir))
+  (setq org-agenda-file-projects (expand-file-name "Projects.org" org-agenda-dir))
+  (setq org-agenda-file-TODOs (expand-file-name "TODOs.org" org-agenda-dir))
+  (setq org-agenda-files-schedule (expand-file-name "Schedule.org" org-agenda-dir))
+
+  ;; 添加每次打开时可添加的任务类型
+  (setq org-capture-templates
+    '(
+       ("i" "Inbox" entry (file+headline org-agenda-file-inbox "Tasks")
+         "* TODO %?\n  %i\n"
+         :empty-lines 0)
+       ("s" "Schedule" entry (file+headline org-agenda-file-schedule "Schedule")
+         "* TODO %?\n  %i\n"
+         :empty-lines 1)
+       ("t" "TODOs" entry (file+headline org-agenda-file-TODOs "TODOs")
+         "* TODO %?\n  %i\n"
+         :empty-lines 1)
+       )
+    )
+
   (setq org-refile-targets '(("~/Documents/Org/GTD/Projects.org" :maxlevel . 3)
                               ("~/Documents/Org/GTD/TODOs.org" :maxlevel . 3)
                               ("~/Documents/Org/GTD/Schedule.org" :maxlevel . 3)))
-  ;; 设置任务流程(这是我的配置)
-  (setq org-todo-keywords
-    '((sequence "TODO(t!)" "WAITE(w!)" "|" "DONE(d!)" "CANCEL(c/!)")))
 
-  ;; 设置任务样式
-  (setq org-todo-keyword-faces
-    '(("WAITE" .   (:foreground "red" :weight bold))
-       ("TODO" .      (:foreground "orange" :weight bold))
-       ("DONE" .      (:foreground "green" :weight bold))
-       ("CANCEL" .     (:background "gray" :foreground "black"))
-       ))
   ;; agenda 里面时间块彩色显示
   ;; From: https://emacs-china.org/t/org-agenda/8679/3
   (defun ljg/org-agenda-time-grid-spacing ()
@@ -73,6 +71,7 @@
               (overlay-put ov 'line-spacing (1- line-height))))))))
 
   (add-hook 'org-agenda-finalize-hook #'ljg/org-agenda-time-grid-spacing)
+
   ;;org-roam
   ;;必须要有init.el中加入(require 'org-roam-protocol)以及打开Emacs Server，否则网页抓取会出现问题
   ;;org-roam的网页抓取原理是利用 org-protocol 这样的外部程序和 Emacs 进行通信的机制
@@ -81,15 +80,15 @@
     '(
        ("s" "simple default" plain "%?"
          :target (file+head "%<%Y%m%d%H>_${slug}.org"
-                   "#+latex_header:\n#+title: ${title}\n\n")
+                   "#+STARTUP:\n#+title: ${title}\n\n")
          :unnarrowed t)
        ("d" "default" plain "%?"
          :target (file+head "%<%Y%m%d%H>_${slug}.org"
-                   "#+latex_header:\n#+title: ${title}\n#+roam_alias:\n#+roam_key:\n#+roam_tags:\n\n")
+                   "#+STARTUP:\n#+title: ${title}\n#+roam_alias:\n#+roam_key:\n#+roam_tags:\n\n")
          :unnarrowed t)
        ("p" "Paper Note" plain "* FIRST PASS\n\n ** Category\n\n** Context\n\n** Correctness\n\n** Contribution\n\n** Clarity\n * SECOND PASS\n\n* * THIRD PASS"
          :target (file+head "%<%Y%m%d%H>_${slug}.org"
-                   "#+latex_header:\n#+title: ${title}\n#+roam_alias:\n#+roam_key:\n#+roam_tags:\n#+keywords:\n\n")
+                   "#+STARTUP:\n#+title: ${title}\n#+roam_alias:\n#+roam_key:\n#+roam_tags:\n#+keywords:\n\n")
          :unnarrowed t
          )
        )
@@ -131,4 +130,11 @@
     :bind (:map org-mode-map
             (("C-c n a" . orb-note-actions))))
 
-  )
+  (setq org-roam-dailies-directory "~/Documents/Org/org-roam-directory/daily")
+
+  (setq org-roam-dailies-capture-templates
+    '(("d" "default" entry
+        "* %?"
+        :target (file+head "%<%Y-%m-%d-%a>.org"
+                  "#+title: %<%Y-%m-%d-%a>\n"))))
+    )

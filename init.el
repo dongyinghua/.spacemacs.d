@@ -58,7 +58,6 @@ This function should only modify configuration layer settings."
          org-todo-dependencies-strategy 'naive-auto
          org-enable-notifications t
          org-start-notification-daemon-on-startup t
-         org-enable-org-journal-support t
          org-enable-roam-support t
          org-enable-roam-server t
          org-enable-roam-protocol t
@@ -92,6 +91,7 @@ This function should only modify configuration layer settings."
          )
        (colors :variables
          colors-enable-nyan-cat-progress-bar t)
+       visual
        )
 
 
@@ -592,10 +592,7 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
-  (setq configuration-layer-elpa-archives
-    '(("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-       ("org-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
-       ("gnu-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")))
+
   ;; use apsell as ispell backend
   (setq-default ispell-program-name "aspell")
   ;; use American English as ispell default dictionary
@@ -637,26 +634,44 @@ before packages are loaded."
            (ignore-errors (backward-up-list))
            (funcall fn)))))
 
+  ;;代码格式.editorconfig
+  (editorconfig-mode t)
+
+  ;;删除很多空格使使用的
+  (global-hungry-delete-mode t)
+  (setq hungry-delete-join-reluctantly t)
+
+  ;;visual-fill-column-mode
+  ;;解决了visual-line-mode中英文混排的情况
+  ;;(global-visual-line-mode t)
+  ;;(add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
+  (global-visual-fill-column-mode t)
+  (setq-default visual-fill-column-center-text t)
+  ;;(setq-local fill-column 180)
+  ;;visual-fill-column-extra-text-width可以调节文本在中间时，文本两边距屏幕边缘的距离
+  (setq-default visual-fill-column-extra-text-width '(15 . 15))
+  (add-hook 'text-mode-hook 'spacemacs/toggle-truncate-lines-off)
+  ;;(add-hook 'text-mode-hook 'visual-fill-column-mode)
+  ;;(add-hook 'text-mode-hook (lambda() (setq-local fill-column 120)))
+
+  ;;取消Emacs的自动备份
+  (setq make-backup-files nil)
+
+  ;;自动插入配对的字符
+  ;;可以自定义匹配
+  (electric-pair-mode t)
+  (setq electric-pair-pairs '(
+                               (?\{ . ?\})
+                               (?\' . ?\')
+                               (?\“ . ?\”)
+                               ))
+
+  ;;加载init-org.el文件
   ;;需要开启Emacs Server才能使用org-roam的网页抓取
   (server-start)
   (load-file "~/.spacemacs.d/init-org.el")
 
-  (defun open-my-init ()
-    (interactive)
-    (find-file "~/.spacemacs.d/init.el"))
-  (global-set-key (kbd "<f1>") 'open-my-init)
-
-  (editorconfig-mode t)
-
-  (global-hungry-delete-mode t)
-  (setq hungry-delete-join-reluctantly t)
-
-  (global-visual-line-mode t)
-
-  (setq make-backup-files nil)
-
-  (electric-pair-mode t)
-
+  ;;加载init-keybindings.el文件
   ;;快捷键绑定
   (load-file "~/.spacemacs.d/init-keybindings.el")
 
@@ -665,6 +680,9 @@ before packages are loaded."
   (setq python-indent-guess-indent-offset-verbose nil)
   (add-to-list 'spacemacs--python-pyvenv-modes 'pyvenv)
   (setenv "WORKON_HOME" "~/.pyenv/versions")
+
+  ;;去除Spacemacs的warning
+  (setq spacemacs-buffer--warnings nil)
   )
 
 
